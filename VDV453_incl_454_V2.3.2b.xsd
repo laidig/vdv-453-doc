@@ -1,0 +1,1109 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- Mit XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) von Gustav Thiesing (BLIC GmbH) bearbeitet -->
+<!--<xsd:schema targetNamespace="vdv453ger" xmlns="vdv453ger" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified" attributeFormDefault="unqualified" version="2.3e"> -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:siri="http://www.siri.org.uk/siri" elementFormDefault="unqualified" attributeFormDefault="unqualified" version="2.3.2a">
+	<!--18.09.2008 thi: Änderungen V2.3 ==> V2.3a: 1. 'HstSeqZaehler' in 'AbbringerInfo' auf 'optional' gesetzt, 2. 'MeldungsID' in 'SXD-ReferenzGruppe' umbenannt in 'siri:SituationNumber'-->
+	<!--28.01.2009 thi: Änderungen V2.3a ==> V2.3b: Validierungsproblem beseitigt in AZBFahrplanlage, AZBFahrplan und FahrtRef-->
+	<!--10.08.2009 thi: Änderung V2.3b ==> V2.3c: optionales Element 'Richtungstext' in IstHalt ergänzt-->
+	<!--4.12.2009 WB: Änderung V2.3c ==> V2.3d: SXDReferenzGruppe wieder aus dem VDV453_incl_454_V2.3c.xsd entfernt da Aufgabe der VDV460-->
+	<!--8.3.2010 WB: Änderung V2.3d ==> V2.3e: Aufruf der SXDReferenzGruppe wieder aus dem VDV453_incl_454_V2.3d.xsd entfernt da Aufgabe der VDV460; im Element MessageXML die Zeile xsd:any namespace="##any" durch xsd:any namespace="##any" processContents="skip" ersetzt, damit bei einer Validierung von AND-Nachrichten beliebiges wohlgeformtes XML innerhalb von MessageXML zugelassen wird-->
+	<!--15.11.2011 rud: Änderung V2.3e ==> V2.3f: 
+		- VonRichtungsText nach jedem RichtungsText eingefügt,
+		- den Typ aller besteheneden RichtungsText, VonRichtungsText und VonRichtungText von type="xsd:string" nach type="RichtungsTextType" angepasst (wie es schon bei einigen RichtungsText war),
+		- die Definition name="DatensatzAlle" mit default="false" ergänzt,
+		- HaltId und HaltepositionsText in ASBFahrplanType und AZBFahrplanType eingefügt,
+		- Geschwindigkeit und KompassRichtung in VISFahrplanlage eingefügt,
+		- Via-Struktur in AZBFahrplanlage eingefügt,
+		- in SollHalt und IstHalt den HaltestellenName-Typ von type="xsd:string" nach type="HstLangType" geändert -->
+	<!--15.12.2011 W. Kohl: Änderung V2.3f ==> V2.3f: 
+		- Neues Complex-Element ZeitQualitaetType,
+		- In IstHalt zwei neue Kind-Elemente IstAbfahrtPrognoseQualitaet und IstAnkunftPrognoseQualitaet vom Typ ZeitQualitaetType -->
+	<!--07.02.2012 D. Rubli: Änderung V2.3f ==> V2.3f: 
+		- WarteInfoType: Element 'WartetNicht' fixed="true"
+		- ZurueckhaltungBisType: Erweitert um den Zeitstempel für die Wartezeit des Abbringers -->
+	<!--24.02.2012 D. Rubli: Änderung V2.3f ==> V2.3f: 
+		- Struktur der vier AZBFahrplanlage-Zeiten angepasst -->
+	<!--16.01.2013 W. Bruns: Änderung V2.3f ==> V2.3g:
+		- Stauindikator eingefügt in ASBFahrplanlage, 
+		- Typänderung Umsteigewegezeit in SollAnschlussType, 
+		- Einfügung ZST in IstFahrtType, 
+		- neue Meldungen ClientStatusAnfrage/Antwort (eingefügt durch W. Isajkin, Init)  -->
+	<!--21.05.2013 D. Rubli: Änderung V2.3g ==> V2.3.2a:
+		- IstFahrtType: ZST von Element nach Attribut korrigiert, 
+		- Alphabetische Sortierung: ClientStatusAnfrage/Antwort und andere Elemente wieder korrekt einsortiert,
+		- TraktionsIDType eingeführt,
+		- ASBFahrtLoeschenType: IDType auf LinienIDType/RichtungsIDType abgeändert-->
+        <!--05.07.2013 W. Bruns: Element Priorität umbeannannt in Prioritaet-->
+	<!--This declaration here is a dummy declaration to facilitate the use of Xerxes and other tools which resolve only the first declaration of a namespace-->
+	<xsd:import namespace="http://www.siri.org.uk/siri" schemaLocation="siri-1.3/siri/siri_all-v1.2.xsd"/>
+	<!--This is the actual dependency which is only to the situation exchange service-->
+	<xsd:import namespace="http://www.siri.org.uk/siri" schemaLocation="siri-1.3/siri/siri_situation-v1.0.xsd"/>
+	<xsd:complexType name="AbbringerFahrtLoeschenType">
+		<xsd:sequence>
+			<xsd:element name="ASBID" type="IDType"/>
+			<xsd:element name="AbbringerInfo" type="AbbringerInfoType"/>
+			<xsd:element name="FahrtIDExt" type="FahrtIDExtType" maxOccurs="unbounded"/>
+			<xsd:element name="Ursache" type="UrsacheType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="AbbringerInfoType">
+		<xsd:sequence>
+			<xsd:element name="FahrtID" type="FahrtIDType"/>
+			<xsd:element name="HstSeqZaehler" type="HstSeqZaehlerType" minOccurs="0"/>
+			<xsd:element name="LinienID" type="LinienIDType"/>
+			<xsd:element name="LinienText" type="LinienTextType"/>
+			<xsd:element name="RichtungsID" type="RichtungsIDType"/>
+			<xsd:element name="RichtungsText" type="RichtungsTextType"/>
+			<xsd:element name="VonRichtungsText" type="RichtungsTextType" minOccurs="0"/>
+			<xsd:element name="AbfahrtszeitASBPlan" type="xsd:dateTime"/>
+			<xsd:element name="HaltID" type="HaltIDType" minOccurs="0"/>
+			<xsd:element name="HaltepositionsText" type="HaltepositionsTextType" minOccurs="0"/>
+			<xsd:element name="FahrtInfo" type="FahrtInfoType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="Abbringernachricht" type="AbbringernachrichtType"/>
+	<xsd:complexType name="AbbringernachrichtType">
+		<xsd:choice>
+			<xsd:element name="HaltepositionsAenderung" type="HaltepositionsAenderungType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="WartetBis" type="WartetBisType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="AbbringerFahrtLoeschen" type="AbbringerFahrtLoeschenType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:choice>
+		<xsd:attribute name="AboID" type="AboIDType" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="AboANDType">
+		<xsd:sequence>
+			<xsd:element name="KanalID" type="KanalIDType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="AboID" type="AboIDType" use="required"/>
+		<xsd:attribute name="VerfallZst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:element name="AboAnfrage" type="AboAnfrageType"/>
+	<xsd:complexType name="AboAnfrageType">
+		<xsd:choice>
+			<xsd:group ref="AboGroup"/>
+			<xsd:choice>
+				<xsd:element name="AboLoeschen" type="AboIDType" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="AboLoeschenAlle" type="xsd:boolean" minOccurs="0"/>
+			</xsd:choice>
+		</xsd:choice>
+		<xsd:attribute name="Sender" type="SenderType" use="required"/>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:element name="AboAntwort" type="AboAntwortType"/>
+	<xsd:complexType name="AboAntwortType">
+		<xsd:sequence>
+			<xsd:element name="Bestaetigung" type="BestaetigungType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AboASBRefType">
+		<xsd:sequence>
+			<xsd:element name="ASBID" type="IDType"/>
+			<xsd:element name="LinienID" type="LinienIDType" minOccurs="0"/>
+			<xsd:element name="RichtungsID" type="RichtungsIDType" minOccurs="0"/>
+			<xsd:element name="FruehesteAnkunftszeit" type="xsd:dateTime"/>
+			<xsd:element name="SpaetesteAnkunftszeit" type="xsd:dateTime"/>
+		</xsd:sequence>
+		<xsd:attribute name="AboID" type="AboIDType" use="required"/>
+		<xsd:attribute name="VerfallZst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="AboASBType">
+		<xsd:sequence>
+			<xsd:element name="ASBID" type="IDType"/>
+			<xsd:choice>
+				<xsd:element name="ZeitFilter" type="ZeitFilterType" minOccurs="0"/>
+				<xsd:element name="FahrtFilter" type="FahrtFilterType" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:choice>
+			<xsd:element name="Hysterese" type="HystereseType"/>
+			<xsd:element name="AbbringerInfo" type="AbbringerInfoType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="AboID" type="AboIDType" use="required"/>
+		<xsd:attribute name="VerfallZst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="AboAUSRefType">
+		<xsd:annotation>
+			<xsd:documentation>Anfrage Sollfahrplan</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Zeitfenster" type="ZeitfensterType"/>
+			<xsd:element name="Linienfilter" type="LinienFilterType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="UmlaufID" type="UmlaufIDType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="FahrplanVersionID" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="DatenVorhandenBis" type="xsd:dateTime" minOccurs="0"/>
+			<xsd:element name="MitGesAnschluss" type="xsd:boolean" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="AboID" type="AboIDType" use="required"/>
+		<xsd:attribute name="VerfallZst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="AboAUSType">
+		<xsd:annotation>
+			<xsd:documentation>Ermittlung von Ist-Fahrten</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="LinienFilter" type="LinienFilterType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="UmlaufID" type="UmlaufIDType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="Hysterese" type="HystereseType"/>
+			<xsd:element name="Vorschauzeit" type="VorschauzeitType"/>
+			<xsd:element name="MitGesAnschluss" type="xsd:boolean" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="AboID" type="AboIDType" use="required"/>
+		<xsd:attribute name="VerfallZst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="AboAZBRefType">
+		<xsd:sequence>
+			<xsd:element name="AZBID" type="IDType"/>
+			<xsd:element name="LinienID" type="LinienIDType" minOccurs="0"/>
+			<xsd:element name="RichtungsID" type="RichtungsIDType" minOccurs="0"/>
+			<xsd:element name="FruehesteAbfahrtszeit" type="xsd:dateTime"/>
+			<xsd:element name="SpaetesteAbfahrtszeit" type="xsd:dateTime"/>
+		</xsd:sequence>
+		<xsd:attribute name="AboID" type="AboIDType" use="required"/>
+		<xsd:attribute name="VerfallZst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="AboAZBType">
+		<xsd:sequence>
+			<xsd:element name="AZBID" type="IDType"/>
+			<xsd:element name="LinienID" type="LinienIDType" minOccurs="0"/>
+			<xsd:element name="RichtungsID" type="RichtungsIDType" minOccurs="0"/>
+			<xsd:element name="Vorschauzeit" type="VorschauzeitType"/>
+			<xsd:element name="MaxAnzahlFahrten" type="AnzahlFahrtenType" minOccurs="0"/>
+			<xsd:element name="Hysterese" type="HystereseType"/>
+			<xsd:element name="MaxTextLaenge" type="MaxTextLaengeType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="AboID" type="AboIDType" use="required"/>
+		<xsd:attribute name="VerfallZst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:group name="AboGroup">
+		<xsd:choice>
+			<xsd:element name="AboASBRef" type="AboASBRefType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="AboASB" type="AboASBType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="AboAZBRef" type="AboAZBRefType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="AboAZB" type="AboAZBType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="AboVIS" type="AboVISType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="AboAND" type="AboANDType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="AboAUSRef" type="AboAUSRefType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="AboAUS" type="AboAUSType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:complexType name="AboVISType">
+		<xsd:sequence>
+			<xsd:element name="VISID" type="IDType"/>
+			<xsd:element name="LinienID" type="LinienIDType" minOccurs="0"/>
+			<xsd:element name="RichtungsID" type="RichtungsIDType" minOccurs="0"/>
+			<xsd:element name="Zyklus" type="ZyklusType"/>
+		</xsd:sequence>
+		<xsd:attribute name="AboID" type="AboIDType" use="required"/>
+		<xsd:attribute name="VerfallZst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="AktiveAbosType">
+		<xsd:group ref="AboGroup"/>
+	</xsd:complexType>
+	<xsd:complexType name="ANDMeldungLoeschenType">
+		<xsd:sequence>
+			<xsd:element name="MeldungsID" type="MeldungsIDType"/>
+		</xsd:sequence>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="ANDMeldungType" mixed="true">
+		<xsd:sequence>
+			<xsd:element name="KanalID" type="KanalIDType"/>
+			<xsd:element name="MeldungsID" type="MeldungsIDType"/>
+			<xsd:element name="FormatID" type="FormatIDType" minOccurs="0"/>
+			<xsd:element name="MessageXML" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence maxOccurs="unbounded">
+						<xsd:any namespace="##any" processContents="skip"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+		<xsd:attribute name="VerfallZst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="ANDNachrichtType">
+		<xsd:sequence>
+			<xsd:element name="ANDMeldung" type="ANDMeldungType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="ANDMeldungLoeschen" type="ANDMeldungLoeschenType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="AboID" type="AboIDType" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="AnschlussPlanType">
+		<xsd:sequence>
+			<xsd:element name="Zubringer" type="FahrtIDGlobalType"/>
+			<xsd:element name="HaltIDZubringer" type="HaltIDType"/>
+			<xsd:element name="Abbringer" type="FahrtIDGlobalType"/>
+			<xsd:element name="HaltIDAbbringer" type="HaltIDType"/>
+			<xsd:element name="Umsteigewegezeit" type="xsd:nonNegativeInteger" minOccurs="0"/>
+			<xsd:element name="MaxAutoVerzoegerung" type="xsd:nonNegativeInteger" minOccurs="0"/>
+			<xsd:element name="Prioritaet" type="PrioritaetType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="AnschlussID" type="AnschlussIDType" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="AnschlussStatusType">
+		<xsd:sequence>
+			<xsd:element name="WarteInfo" type="WarteInfoType"/>
+			<xsd:element name="AbfahrtszeitAbbringerPrognose" type="xsd:dateTime" minOccurs="0"/>
+			<xsd:element name="SicherungAufgehoben" type="xsd:boolean" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="AnschlussID" type="AnschlussIDType" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="ASBFahrplanlageType">
+		<xsd:sequence>
+			<xsd:element name="ASBID" type="IDType"/>
+			<xsd:element name="FahrtID" type="FahrtIDType"/>
+			<xsd:element name="HstSeqZaehler" type="HstSeqZaehlerType"/>
+			<xsd:element name="LinienID" type="LinienIDType"/>
+			<xsd:element name="LinienText" type="LinienTextType"/>
+			<xsd:element name="RichtungsID" type="RichtungsIDType"/>
+			<xsd:element name="RichtungsText" type="RichtungsTextType"/>
+			<xsd:element name="VonRichtungsText" type="RichtungsTextType" minOccurs="0"/>
+			<xsd:element name="AufASB" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="AnkunftszeitASBPlan" type="xsd:dateTime"/>
+			<xsd:element name="AnkunftszeitASBPrognose" type="xsd:dateTime"/>
+			<xsd:element name="FahrtStatus" type="FahrtStatusType"/>
+			<xsd:element name="UmsteigeWillige" type="UmsteigeWilligeType" minOccurs="0"/>
+			<xsd:element name="ZubringerHstLang" type="HstLangType" minOccurs="0"/>
+			<xsd:element name="SpaetesteAbbringerInfo" type="xsd:dateTime" minOccurs="0"/>
+			<xsd:element name="HaltID" type="HaltIDType" minOccurs="0"/>
+			<xsd:element name="HaltepositionsText" type="HaltepositionsTextType" minOccurs="0"/>
+			<xsd:element name="Stauindikator" type="xsd:boolean" default="false" minOccurs="0"/>
+			<xsd:element name="FahrtInfo" type="FahrtInfoType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+		<xsd:attribute name="VerfallZst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="ASBFahrplanType">
+		<xsd:sequence>
+			<xsd:element name="ASBID" type="IDType"/>
+			<xsd:element name="FahrtID" type="FahrtIDType"/>
+			<xsd:element name="HstSeqZaehler" type="HstSeqZaehlerType"/>
+			<xsd:element name="LinienID" type="LinienIDType"/>
+			<xsd:element name="LinienText" type="LinienTextType"/>
+			<xsd:element name="RichtungsID" type="RichtungsIDType"/>
+			<xsd:element name="RichtungsText" type="RichtungsTextType"/>
+			<xsd:element name="VonRichtungsText" type="RichtungsTextType" minOccurs="0"/>
+			<xsd:element name="AnkunftszeitASBPlan" type="xsd:dateTime"/>
+			<xsd:element name="HaltID" type="HaltIDType" minOccurs="0"/>
+			<xsd:element name="HaltepositionsText" type="HaltepositionsTextType" minOccurs="0"/>
+			<xsd:element name="FahrtInfo" type="FahrtInfoType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="ASBFahrtLoeschenType">
+		<xsd:sequence>
+			<xsd:element name="ASBID" type="IDType"/>
+			<xsd:element name="FahrtID" type="FahrtIDType"/>
+			<xsd:element name="HstSeqZaehler" type="HstSeqZaehlerType"/>
+			<xsd:element name="LinienID" type="LinienIDType"/>
+			<xsd:element name="LinienText" type="LinienTextType"/>
+			<xsd:element name="RichtungsID" type="RichtungsIDType"/>
+			<xsd:element name="RichtungsText" type="RichtungsTextType"/>
+			<xsd:element name="VonRichtungsText" type="RichtungsTextType" minOccurs="0"/>
+			<xsd:element name="Ursache" type="UrsacheType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="AUSNachrichtType">
+		<xsd:choice>
+			<xsd:element name="Linienfahrplan" type="LinienFahrplanType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="SollUmlauf" type="SollUmlaufType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="IstFahrt" type="IstFahrtType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="IstUmlauf" type="IstUmlaufType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="GesAnschluss" type="GesAnschlussType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:choice>
+		<xsd:attribute name="AboID" type="AboIDType" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="AZBFahrplanlageType">
+		<xsd:sequence>
+			<xsd:element name="AZBID" type="IDType"/>
+			<xsd:element name="FahrtID" type="FahrtIDType"/>
+			<xsd:element name="HstSeqZaehler" type="HstSeqZaehlerType"/>
+			<xsd:element name="Traktion" type="TraktionsType" minOccurs="0"/>
+			<xsd:element name="BetrieblicheFahrzeugnummer" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="LinienID" type="LinienIDType"/>
+			<xsd:element name="LinienText" type="LinienTextType"/>
+			<xsd:element name="RichtungsID" type="RichtungsIDType"/>
+			<xsd:element name="RichtungsText" type="RichtungsTextType"/>
+			<xsd:element name="VonRichtungsText" type="RichtungsTextType" minOccurs="0"/>
+			<xsd:element name="AbmeldeID" type="AbmeldeIDType" minOccurs="0"/>
+			<xsd:element name="ZielHst" type="HstLangType"/>
+			<xsd:element name="AufAZB" type="xsd:boolean" default="false" minOccurs="0"/>
+			<xsd:element name="ViaHst1Lang" type="HstLangType" minOccurs="0"/>
+			<xsd:element name="ViaHst2Lang" type="HstLangType" minOccurs="0"/>
+			<xsd:element name="ViaHst3Lang" type="HstLangType" minOccurs="0"/>
+			<xsd:element name="Via" type="ViaType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Name und Prioritäten der Via-Haltestellen. Diese neue Struktur wurde nachträglich zu den drei ViaHstxLang hinzugefügt, welche weiterhin auch noch abgefüllt werden sollten um abwärtskompatibel zu bleiben.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FahrtStatus" type="FahrtStatusType"/>
+			<xsd:choice>
+				<xsd:sequence>
+					<xsd:annotation>
+						<xsd:documentation>Aussetzer- und Durchfahrt</xsd:documentation>
+					</xsd:annotation>
+					<xsd:element name="AnkunftszeitAZBPlan" type="xsd:dateTime"/>
+					<xsd:element name="AnkunftszeitAZBPrognose" type="xsd:dateTime" minOccurs="0"/>
+					<xsd:sequence minOccurs="0">
+						<xsd:element name="AbfahrtszeitAZBPlan" type="xsd:dateTime"/>
+						<xsd:element name="AbfahrtszeitAZBPrognose" type="xsd:dateTime" minOccurs="0"/>
+					</xsd:sequence>
+				</xsd:sequence>
+				<xsd:sequence>
+					<xsd:annotation>
+						<xsd:documentation>Einsetzerfahrt</xsd:documentation>
+					</xsd:annotation>
+					<xsd:element name="AbfahrtszeitAZBPlan" type="xsd:dateTime"/>
+					<xsd:element name="AbfahrtszeitAZBPrognose" type="xsd:dateTime" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:choice>
+			<xsd:element name="AbfahrtszeitAZBDisposition" type="xsd:dateTime" minOccurs="0"/>
+			<xsd:element name="Fahrtspezialtext" type="FahrtspezialtextType" minOccurs="0"/>
+			<xsd:element name="Sprachausgabe" type="SprachausgabeType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="HaltID" type="HaltIDType" minOccurs="0"/>
+			<xsd:element name="HaltepositionsText" type="HaltepositionsTextType" minOccurs="0"/>
+			<xsd:element name="Stauindikator" type="xsd:boolean" default="false" minOccurs="0"/>
+			<xsd:element name="FahrtInfo" type="FahrtInfoType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+		<xsd:attribute name="VerfallZst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="AZBFahrplanType">
+		<xsd:sequence>
+			<xsd:element name="AZBID" type="IDType"/>
+			<xsd:element name="FahrtID" type="FahrtIDType"/>
+			<xsd:element name="HstSeqZaehler" type="HstSeqZaehlerType"/>
+			<xsd:element name="LinienID" type="LinienIDType"/>
+			<xsd:element name="LinienText" type="LinienTextType"/>
+			<xsd:element name="RichtungsID" type="RichtungsIDType"/>
+			<xsd:element name="RichtungsText" type="RichtungsTextType"/>
+			<xsd:element name="VonRichtungsText" type="RichtungsTextType" minOccurs="0"/>
+			<xsd:choice>
+				<xsd:sequence>
+					<xsd:annotation>
+						<xsd:documentation>Aussetzer- und Durchfahrt</xsd:documentation>
+					</xsd:annotation>
+					<xsd:element name="AnkunftszeitAZBPlan" type="xsd:dateTime"/>
+					<xsd:element name="AbfahrtszeitAZBPlan" type="xsd:dateTime" minOccurs="0"/>
+				</xsd:sequence>
+				<xsd:sequence>
+					<xsd:annotation>
+						<xsd:documentation>Einsetzerfahrt</xsd:documentation>
+					</xsd:annotation>
+					<xsd:element name="AbfahrtszeitAZBPlan" type="xsd:dateTime"/>
+				</xsd:sequence>
+			</xsd:choice>
+			<xsd:element name="HaltID" type="HaltIDType" minOccurs="0"/>
+			<xsd:element name="HaltepositionsText" type="HaltepositionsTextType" minOccurs="0"/>
+			<xsd:element name="FahrtInfo" type="FahrtInfoType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="AZBFahrtLoeschenType">
+		<xsd:sequence>
+			<xsd:element name="AZBID" type="IDType"/>
+			<xsd:element name="FahrtID" type="FahrtIDType"/>
+			<xsd:element name="HstSeqZaehler" type="HstSeqZaehlerType"/>
+			<xsd:element name="LinienID" type="LinienIDType"/>
+			<xsd:element name="LinienText" type="LinienTextType"/>
+			<xsd:element name="RichtungsID" type="RichtungsIDType"/>
+			<xsd:element name="RichtungsText" type="RichtungsTextType"/>
+			<xsd:element name="VonRichtungsText" type="RichtungsTextType" minOccurs="0"/>
+			<xsd:element name="AbmeldeID" type="AbmeldeIDType" minOccurs="0"/>
+			<xsd:element name="Ursache" type="UrsacheType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="AZBLinienspezialtextType">
+		<xsd:sequence>
+			<xsd:element name="AZBID" type="IDType"/>
+			<xsd:element name="LinienID" type="LinienIDType"/>
+			<xsd:element name="Linientext" type="LinienTextType" minOccurs="0"/>
+			<xsd:element name="RichtungsID" type="RichtungsIDType"/>
+			<xsd:element name="Linienspezialtext" type="LinienspezialtextType"/>
+			<xsd:element name="Prioritaet" type="PrioritaetType" minOccurs="0"/>
+			<xsd:element name="Sprachausgabe" type="SprachausgabeType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+		<xsd:attribute name="VerfallZst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="AZBLinienspezialtextLoeschenType">
+		<xsd:sequence>
+			<xsd:element name="AZBID" type="IDType"/>
+			<xsd:element name="LinienID" type="LinienIDType"/>
+			<xsd:element name="RichtungsID" type="RichtungsIDType"/>
+		</xsd:sequence>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="AZBNachrichtType">
+		<xsd:sequence>
+			<xsd:element name="AZBFahrplan" type="AZBFahrplanType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="AZBFahrplanlage" type="AZBFahrplanlageType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="AZBFahrtLoeschen" type="AZBFahrtLoeschenType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="AZBLinienspezialtext" type="AZBLinienspezialtextType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="AZBLinienspezialtextLoeschen" type="AZBLinienspezialtextLoeschenType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="AboID" type="AboIDType" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="BestaetigungType">
+		<xsd:sequence>
+			<xsd:element name="Fehlertext" type="FehlertextType" minOccurs="0"/>
+			<xsd:element name="DatenGueltigBis" type="xsd:dateTime" minOccurs="0"/>
+			<xsd:element name="KuerzMoeglicherZyklus" type="ZyklusType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+		<xsd:attribute name="Ergebnis" type="ErgebnisType" use="required"/>
+		<xsd:attribute name="Fehlernummer" type="FehlernummerType" use="required"/>
+	</xsd:complexType>
+	<xsd:element name="ClientStatusAnfrage" type="ClientStatusAnfrageType"/>
+	<xsd:complexType name="ClientStatusAnfrageType">
+		<xsd:attribute name="Sender" type="SenderType" use="required"/>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+		<xsd:attribute name="MitAbos" type="xsd:boolean" use="optional" default="false"/>
+	</xsd:complexType>
+	<xsd:element name="ClientStatusAntwort" type="ClientStatusAntwortType"/>
+	<xsd:complexType name="ClientStatusAntwortType">
+		<xsd:sequence>
+			<xsd:element name="Status" type="StatusType"/>
+			<xsd:element name="StartDienstZst" type="xsd:dateTime"/>
+			<xsd:element name="AktiveAbos" type="AktiveAbosType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="DatenAbrufenAnfrage" type="DatenAbrufenAnfrageType"/>
+	<xsd:complexType name="DatenAbrufenAnfrageType">
+		<xsd:sequence>
+			<xsd:element name="DatensatzAlle" type="xsd:boolean" default="false" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="Sender" type="SenderType" use="required"/>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:element name="DatenAbrufenAntwort" type="DatenAbrufenAntwortType"/>
+	<xsd:complexType name="DatenAbrufenAntwortType">
+		<xsd:sequence>
+			<xsd:element name="Bestaetigung" type="BestaetigungType"/>
+			<xsd:element name="WeitereDaten" type="xsd:boolean" default="false" minOccurs="0"/>
+			<xsd:choice minOccurs="0">
+				<xsd:element name="Zubringernachricht" type="ZubringernachrichtType" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="Abbringernachricht" type="AbbringernachrichtType" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="AZBNachricht" type="AZBNachrichtType" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="VISNachricht" type="VISNachrichtType" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="ANDNachricht" type="ANDNachrichtType" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="AUSNachricht" type="AUSNachrichtType" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="DatenBereitAnfrage" type="DatenBereitAnfrageType"/>
+	<xsd:complexType name="DatenBereitAnfrageType">
+		<xsd:attribute name="Sender" type="SenderType" use="required"/>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required">
+			<!--Erstellzeitpunkt der DatenbereitAnfrage.-->
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:element name="DatenBereitAntwort" type="DatenBereitAntwortType"/>
+	<xsd:complexType name="DatenBereitAntwortType">
+		<xsd:sequence>
+			<xsd:element name="Bestaetigung" type="BestaetigungType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="DirektrufType">
+		<xsd:sequence>
+			<xsd:element name="Telefonnummer" type="TelefonnummerType" minOccurs="0"/>
+			<xsd:element name="IPAdresse" type="IPAdresseType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="FahrtFilterType">
+		<xsd:sequence>
+			<xsd:element name="FahrtID" type="FahrtIDType"/>
+			<xsd:element name="HstSeqZaehler" type="HstSeqZaehlerType"/>
+			<xsd:element name="AnkunftszeitASBPlan" type="xsd:dateTime"/>
+			<xsd:element name="Vorschauzeit" type="VorschauzeitType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="FahrtIDExtType">
+		<xsd:sequence>
+			<xsd:element name="FahrtBezeichner" type="FahrtBezeichnerType"/>
+			<xsd:element name="Betriebstag" type="xsd:date"/>
+			<xsd:element name="HstSeqZaehler" type="HstSeqZaehlerType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="FahrtIDGlobalType">
+		<xsd:sequence>
+			<xsd:element name="FahrtIDExt" type="FahrtIDExtType"/>
+			<xsd:element name="LinienID" type="LinienIDType" minOccurs="0"/>
+			<xsd:element name="LeitstellenID" type="LeitstellenIDType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="FahrtIDType">
+		<xsd:sequence>
+			<xsd:element name="FahrtBezeichner" type="FahrtBezeichnerType"/>
+			<xsd:element name="Betriebstag" type="xsd:date"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="FahrtInfoType">
+		<xsd:sequence>
+			<xsd:element name="FahrzeugID" type="FahrzeugIDType" minOccurs="0"/>
+			<xsd:element name="LinienNr" type="LinienNrType" minOccurs="0"/>
+			<xsd:element name="UmlaufNr" type="UmlaufNrType" minOccurs="0"/>
+			<xsd:element name="KursNr" type="KursNrType" minOccurs="0"/>
+			<xsd:element name="StartHstLang" type="HstLangType" minOccurs="0"/>
+			<xsd:element name="StartHst" type="HstKurzType" minOccurs="0"/>
+			<xsd:element name="ZielHstLang" type="HstLangType" minOccurs="0"/>
+			<xsd:element name="ZielHst" type="HstKurzType" minOccurs="0"/>
+			<xsd:element name="AbfahrtszeitStartHst" type="xsd:dateTime" minOccurs="0"/>
+			<xsd:element name="AnkunftszeitZielHst" type="xsd:dateTime" minOccurs="0"/>
+			<xsd:element name="ProduktID" type="ProduktIDType" minOccurs="0"/>
+			<xsd:element name="Betreiber" type="BetreiberType" minOccurs="0"/>
+			<xsd:element name="ServiceMerkmal" type="ServiceMerkmalType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="Direktruf" type="DirektrufType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="FahrtRefType">
+		<xsd:choice>
+			<xsd:sequence>
+				<xsd:element name="FahrtID" type="FahrtIDType"/>
+				<xsd:element name="FahrtStartEnde" type="FahrtStartEndeType" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:sequence>
+				<xsd:element name="FahrtStartEnde" type="FahrtStartEndeType"/>
+			</xsd:sequence>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="FahrtStartEndeType">
+		<xsd:sequence>
+			<xsd:element name="StartHaltID" type="HaltIDType"/>
+			<xsd:element name="Startzeit" type="xsd:dateTime"/>
+			<xsd:element name="EndHaltID" type="HaltIDType"/>
+			<xsd:element name="Endzeit" type="xsd:dateTime"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="GesAnschlussType">
+		<xsd:choice>
+			<xsd:element name="AnschlussPlan" type="AnschlussPlanType"/>
+			<xsd:element name="AnschlussStatus" type="AnschlussStatusType"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="HaltepositionsAenderungType">
+		<xsd:sequence>
+			<xsd:element name="ASBID" type="IDType"/>
+			<xsd:element name="AbbringerInfo" type="AbbringerInfoType"/>
+			<xsd:element name="FahrtIDExt" type="FahrtIDExtType" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="IstFahrtType">
+		<xsd:sequence>
+			<xsd:element name="LinienID" type="LinienIDType"/>
+			<xsd:element name="RichtungsID" type="RichtungsIDType"/>
+			<xsd:element name="FahrtRef" type="FahrtRefType"/>
+			<xsd:element name="Komplettfahrt" type="xsd:boolean" nillable="false"/>
+			<xsd:element name="UmlaufID" type="UmlaufIDType" minOccurs="0"/>
+			<xsd:element name="IstHalt" type="IstHaltType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="LinienText" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="ProduktID" type="ProduktIDType" minOccurs="0"/>
+			<xsd:element name="RichtungsText" type="RichtungsTextType" minOccurs="0"/>
+			<xsd:element name="VonRichtungText" type="RichtungsTextType" minOccurs="0"/>
+			<xsd:element name="HinweisText" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="Zugname" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="VerkehrsmittelText" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="PrognoseMoeglich" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="PrognoseUngenau" type="PrognoseUngenauType" minOccurs="0"/>
+			<xsd:element name="Zusatzfahrt" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="FaelltAus" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="StoerungsInfo" type="StoerungsInfoType" minOccurs="0"/>
+			<xsd:element name="FahrradMitnahme" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="FahrzeugTypID" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="Besetztgrad" type="BesetztgradType" minOccurs="0"/>
+			<xsd:element name="ServiceAttribut" type="ServiceAttributType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="Zst" type="xsd:dateTime"/>
+	</xsd:complexType>
+	<xsd:complexType name="IstUmlaufType">
+		<xsd:sequence>
+			<xsd:element name="UmlaufID" type="UmlaufIDType"/>
+			<xsd:choice>
+				<xsd:element name="IstFahrt" type="IstFahrtType" minOccurs="0" maxOccurs="unbounded">
+					<xsd:annotation>
+						<xsd:documentation>Element bleibt aus Kompatibilitätsgründen enthalten, bei Neuimplementierungen IstUmlaufFahrt benutzen</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="IstUmlaufFahrt" type="IstUmlaufFahrtType" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="IstUmlaufFahrtType">
+		<xsd:sequence>
+			<xsd:element name="LinienID" type="LinienIDType"/>
+			<xsd:element name="IstFahrt" type="IstFahrtType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="IstHaltType">
+		<xsd:sequence>
+			<xsd:element name="HaltID" type="HaltIDType"/>
+			<xsd:element name="HaltestellenName" type="HstLangType" minOccurs="0"/>
+			<xsd:element name="Abfahrtszeit" type="xsd:dateTime" minOccurs="0"/>
+			<xsd:element name="Ankunftszeit" type="xsd:dateTime" minOccurs="0"/>
+			<xsd:element name="IstAbfahrtPrognose" type="xsd:dateTime" minOccurs="0"/>
+			<xsd:element name="IstAnkunftPrognose" type="xsd:dateTime" minOccurs="0"/>
+			<xsd:element name="IstAbfahrtPrognoseQualitaet" type="ZeitQualitaetType" minOccurs="0"/>
+			<xsd:element name="IstAnkunftPrognoseQualitaet" type="ZeitQualitaetType" minOccurs="0"/>
+			<xsd:element name="IstAbfahrtDisposition" type="xsd:dateTime" minOccurs="0"/>
+			<xsd:element name="IstAnkunftDisposition" type="xsd:dateTime" minOccurs="0"/>
+			<xsd:element name="PrognoseUngenau" type="PrognoseUngenauType" minOccurs="0"/>
+			<xsd:element name="AbfahrtssteigText" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="AnkunftssteigText" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="Einsteigeverbot" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="Aussteigeverbot" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="Durchfahrt" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="Zusatzhalt" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="RichtungsText" type="RichtungsTextType" minOccurs="0"/>
+			<xsd:element name="VonRichtungText" type="RichtungsTextType" minOccurs="0"/>
+			<xsd:element name="HinweisText" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="StoerungsInfo" type="StoerungsInfoType" minOccurs="0"/>
+			<xsd:element name="Besetztgrad" type="BesetztgradType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="LinienFahrplanType">
+		<xsd:annotation>
+			<xsd:documentation>Fahrplandaten </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="LinienID" type="LinienIDType"/>
+			<xsd:element name="RichtungsID" type="RichtungsIDType"/>
+			<xsd:element name="FahrplanVersionID" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="SollFahrt" type="SollFahrtType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="ProduktID" type="ProduktIDType" minOccurs="0"/>
+			<xsd:element name="LinienText" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="RichtungsText" type="RichtungsTextType" minOccurs="0"/>
+			<xsd:element name="VonRichtungsText" type="RichtungsTextType" minOccurs="0"/>
+			<xsd:element name="VerkehrsmittelText" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="PrognoseMoeglich" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="FahrradMitnahme" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="HinweisText" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="LinienFilterType">
+		<xsd:annotation>
+			<xsd:documentation>Filterung von bestimmten Linien</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="LinienID" type="LinienIDType"/>
+			<xsd:element name="RichtungsID" type="RichtungsIDType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ServiceAttributType">
+		<xsd:sequence>
+			<xsd:element name="Name" type="xsd:string"/>
+			<xsd:element name="Wert" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SollAnschlussType">
+		<xsd:sequence>
+			<xsd:element name="FahrtID" type="FahrtIDType"/>
+			<xsd:element name="HaltID" type="HaltIDType" minOccurs="0"/>
+			<xsd:element name="Umsteigewegezeit" type="xsd:nonNegativeInteger" minOccurs="0"/>
+			<xsd:element name="Sitzenbleiben" type="xsd:boolean" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SollFahrtType">
+		<xsd:sequence>
+			<xsd:element name="FahrtID" type="FahrtIDType"/>
+			<xsd:element name="SollHalt" type="SollHaltType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="UmlaufID" type="UmlaufIDType" minOccurs="0"/>
+			<xsd:element name="LinienText" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="ProduktID" type="ProduktIDType" minOccurs="0"/>
+			<xsd:element name="RichtungsText" type="RichtungsTextType" minOccurs="0"/>
+			<xsd:element name="VonRichtungText" type="RichtungsTextType" minOccurs="0"/>
+			<xsd:element name="HinweisText" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="Zugname" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="VerkehrsmittelText" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="PrognoseMoeglich" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="Zusatzfahrt" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="FaelltAus" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="FahrradMitnahme" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="FahrzeugTypID" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="ServiceAttribut" type="ServiceAttributType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SollHaltType">
+		<xsd:sequence>
+			<xsd:element name="HaltID" type="HaltIDType"/>
+			<xsd:element name="HaltestellenName" type="HstLangType" minOccurs="0"/>
+			<xsd:element name="Abfahrtszeit" type="xsd:dateTime" minOccurs="0"/>
+			<xsd:element name="Ankunftszeit" type="xsd:dateTime" minOccurs="0"/>
+			<xsd:element name="AbfahrtssteigText" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="AnkunftssteigText" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="Einsteigeverbot" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="Aussteigeverbot" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="Durchfahrt" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="RichtungsText" type="RichtungsTextType" minOccurs="0"/>
+			<xsd:element name="VonRichtungText" type="RichtungsTextType" minOccurs="0"/>
+			<xsd:element name="HinweisText" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="SollAnschluss" type="SollAnschlussType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SollUmlaufFahrtType">
+		<xsd:sequence>
+			<xsd:element name="LinienID" type="LinienIDType"/>
+			<xsd:element name="SollFahrt" type="SollFahrtType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SollUmlaufType">
+		<xsd:sequence>
+			<xsd:element name="UmlaufID" type="UmlaufIDType"/>
+			<xsd:choice>
+				<xsd:element name="SollFahrt" type="SollFahrtType" minOccurs="0" maxOccurs="unbounded">
+					<xsd:annotation>
+						<xsd:documentation>Element bleibt aus Kompatibilitätsgründen in Version 2.3 bestehen, bei Nueimplementierungen SollUmlaufFahrt benutzen</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="SollUmlaufFahrt" type="SollUmlaufFahrtType" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="StatusAnfrage" type="StatusAnfrageType"/>
+	<xsd:complexType name="StatusAnfrageType">
+		<xsd:attribute name="Sender" type="SenderType" use="required"/>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:element name="StatusAntwort" type="StatusAntwortType"/>
+	<xsd:complexType name="StatusAntwortType">
+		<xsd:sequence>
+			<xsd:element name="Status" type="StatusType"/>
+			<xsd:element name="DatenBereit" type="xsd:boolean"/>
+			<xsd:element name="StartDienstZst" type="xsd:dateTime"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="StatusType">
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+		<xsd:attribute name="Ergebnis" type="ErgebnisType" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="StoerungsInfoType">
+		<xsd:sequence>
+			<xsd:element name="Ursache" type="UrsacheType" minOccurs="0"/>
+			<xsd:group ref="siri:TpegReasonGroup" minOccurs="0"/>
+			<xsd:choice>
+				<xsd:group ref="siri:SituationBaseIdentityGroup" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>Type for Reference to a  Situation or an update to a situation. Participant ref is optional and may be supplied from context</xsd:documentation>
+					</xsd:annotation>
+				</xsd:group>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="TraktionsType">
+		<xsd:sequence>
+			<xsd:element name="TraktionsID" type="TraktionsIDType"/>
+			<xsd:element name="AnzahlFahrten" type="AnzahlFahrtenType" minOccurs="0"/>
+			<xsd:element name="Position" type="PositionsType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ViaType">
+		<xsd:sequence>
+			<xsd:element name="HaltestellenName" type="HstLangType"/>
+			<xsd:element name="HaltestellenPrioritaet" type="xsd:positiveInteger" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Je kleiner die Zahl desto höher die Priorität</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="VISFahrplanlageType">
+		<xsd:sequence>
+			<xsd:element name="VISID" type="IDType"/>
+			<xsd:element name="FahrtID" type="FahrtIDType"/>
+			<xsd:element name="LinienID" type="LinienIDType"/>
+			<xsd:element name="LinienText" type="LinienTextType"/>
+			<xsd:element name="RichtungsID" type="RichtungsIDType"/>
+			<xsd:element name="RichtungsText" type="RichtungsTextType"/>
+			<xsd:element name="VonRichtungsText" type="RichtungsTextType" minOccurs="0"/>
+			<xsd:element name="FahrtStatus" type="FahrtStatusType"/>
+			<xsd:element name="Verspaetung" type="VerspaetungType" minOccurs="0"/>
+			<xsd:element name="StartHst" type="HstKurzType" minOccurs="0"/>
+			<xsd:element name="EndHst" type="HstKurzType" minOccurs="0"/>
+			<xsd:element name="AktHst" type="HstKurzType" minOccurs="0"/>
+			<xsd:element name="HstSeqZaehler" type="HstSeqZaehlerType" minOccurs="0"/>
+			<xsd:element name="AufHst" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="NachHst" type="HstKurzType" minOccurs="0"/>
+			<xsd:element name="Distanz" type="DistanzType" minOccurs="0"/>
+			<xsd:element name="Geschwindigkeit" type="xsd:integer" minOccurs="0"/>
+			<xsd:element name="KompassRichtung" minOccurs="0">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:nonNegativeInteger">
+						<xsd:minInclusive value="0"/>
+						<xsd:maxInclusive value="359"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="Longitude" type="LongitudeType" minOccurs="0"/>
+			<xsd:element name="Latitude" type="LatitudeType" minOccurs="0"/>
+			<xsd:element name="Stauindikator" type="xsd:boolean" minOccurs="0"/>
+			<xsd:element name="FahrtInfo" type="FahrtInfoType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+		<xsd:attribute name="VerfallZst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="VISFahrtLoeschenType">
+		<xsd:sequence>
+			<xsd:element name="VISID" type="IDType"/>
+			<xsd:element name="FahrtID" type="FahrtIDType"/>
+			<xsd:element name="LinienID" type="LinienIDType"/>
+			<xsd:element name="LinienText" type="LinienTextType"/>
+			<xsd:element name="RichtungsID" type="RichtungsIDType"/>
+			<xsd:element name="RichtungsText" type="RichtungsTextType"/>
+			<xsd:element name="VonRichtungsText" type="RichtungsTextType" minOccurs="0"/>
+			<xsd:element name="Ursache" type="UrsacheType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="VISNachrichtType">
+		<xsd:sequence>
+			<xsd:element name="VISFahrplanlage" type="VISFahrplanlageType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="VISFahrtLoeschen" type="VISFahrtLoeschenType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="AboID" type="AboIDType" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="WarteInfoType">
+		<xsd:choice>
+			<xsd:element name="WartetNicht" fixed="true"/>
+			<xsd:element name="ZurueckhaltungBis" type="ZurueckhaltungBisType"/>
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="WartetBisType">
+		<xsd:sequence>
+			<xsd:element name="ASBID" type="IDType"/>
+			<xsd:element name="AbbringerInfo" type="AbbringerInfoType"/>
+			<xsd:element name="FahrtIDExt" type="FahrtIDExtType" maxOccurs="unbounded"/>
+			<xsd:element name="AbfahrtszeitASBPrognose" type="xsd:dateTime"/>
+			<xsd:element name="Verlaesslichkeit" type="VerlaesslichkeitType" minOccurs="0"/>
+		</xsd:sequence>
+		<xsd:attribute name="Zst" type="xsd:dateTime" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="ZeitfensterType">
+		<xsd:sequence>
+			<xsd:element name="GueltigVon" type="xsd:dateTime"/>
+			<xsd:element name="GueltigBis" type="xsd:dateTime"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ZeitFilterType">
+		<xsd:sequence>
+			<xsd:element name="LinienID" type="LinienIDType" minOccurs="0"/>
+			<xsd:element name="RichtungsID" type="RichtungsIDType" minOccurs="0"/>
+			<xsd:element name="FruehesteAnkunftszeit" type="xsd:dateTime"/>
+			<xsd:element name="SpaetesteAnkunftszeit" type="xsd:dateTime"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ZeitQualitaetType">
+		<xsd:annotation>
+			<xsd:documentation>Prognosequalität</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PrognoseVerlaesslichkeit" type="VerlaesslichkeitType"/>
+			<xsd:sequence minOccurs="0">
+				<xsd:element name="ZeitMin" type="xsd:dateTime"/>
+				<xsd:element name="ZeitMax" type="xsd:dateTime"/>
+			</xsd:sequence>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ZubringernachrichtType">
+		<xsd:sequence>
+			<xsd:element name="ASBFahrplan" type="ASBFahrplanType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="ASBFahrplanlage" type="ASBFahrplanlageType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="ASBFahrtLoeschen" type="ASBFahrtLoeschenType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="AboID" type="AboIDType" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="ZurueckhaltungBisType">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:dateTime">
+				<xsd:attribute name="FahrzeugQuittung" type="xsd:boolean" use="optional" default="true"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<xsd:simpleType name="AbmeldeIDType">
+		<xsd:restriction base="xsd:positiveInteger"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="AboIDType">
+		<xsd:restriction base="xsd:positiveInteger"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="AnschlussIDType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="AnzahlFahrtenType">
+		<xsd:restriction base="xsd:positiveInteger"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="BesetztgradType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Schwach besetzt"/>
+			<xsd:enumeration value="Stark besetzt"/>
+			<xsd:enumeration value="Überfüllt"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="BetreiberType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="DistanzType">
+		<xsd:restriction base="xsd:nonNegativeInteger"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="ErgebnisType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="ok"/>
+			<xsd:enumeration value="notok"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="FahrtBezeichnerType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="FahrtspezialtextType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="FahrtStatusType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Soll"/>
+			<xsd:enumeration value="Ist"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="FahrzeugIDType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="FehlernummerType">
+		<xsd:restriction base="xsd:integer">
+			<xsd:pattern value="[0-9]{0,10}"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="FehlertextType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="FormatIDType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="HaltepositionsTextType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="HaltIDType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="HstKurzType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="HstLangType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="HstSeqZaehlerType">
+		<xsd:restriction base="xsd:nonNegativeInteger"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="HystereseType">
+		<xsd:restriction base="xsd:positiveInteger"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="IDType">
+		<xsd:restriction base="xsd:string">
+			<xsd:maxLength value="40"/>
+			<xsd:minLength value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="IPAdresseType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="KanalIDType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="KursNrType">
+		<xsd:restriction base="xsd:positiveInteger"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="LatitudeType">
+		<xsd:restriction base="xsd:integer"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="LeitstellenIDType">
+		<xsd:restriction base="xsd:NMTOKEN"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="LinienIDType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="LinienNrType">
+		<xsd:restriction base="xsd:positiveInteger"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="LinienspezialtextType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="LinienTextType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="LongitudeType">
+		<xsd:restriction base="xsd:integer"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="MaxTextLaengeType">
+		<xsd:restriction base="xsd:positiveInteger"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="MeldungsIDType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="PositionsType">
+		<xsd:restriction base="xsd:positiveInteger"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="PrioritaetType">
+		<xsd:restriction base="xsd:positiveInteger">
+			<xsd:minInclusive value="1"/>
+			<xsd:maxInclusive value="3"/>
+			<xsd:totalDigits value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ProduktIDType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="PrognoseUngenauType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Fahrzeug im Stau"/>
+			<xsd:enumeration value="technisches Problem"/>
+			<xsd:enumeration value="dispositive Maßnahme"/>
+			<xsd:enumeration value="fehlende Aktualisierung"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="RichtungsIDType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="RichtungsTextType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="SenderType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="ServiceMerkmalType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="SprachausgabeType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="TelefonnummerType">
+		<xsd:restriction base="xsd:integer"/>
+	</xsd:simpleType>
+    <xsd:simpleType name="TraktionsIDType">
+        <xsd:restriction base="xsd:string"/>
+    </xsd:simpleType>
+	<xsd:simpleType name="UmlaufIDType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="UmlaufNrType">
+		<xsd:restriction base="xsd:positiveInteger"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="UmsteigeWilligeType">
+		<xsd:restriction base="xsd:integer"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="UrsacheType">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="VerlaesslichkeitType">
+		<xsd:restriction base="xsd:positiveInteger">
+			<xsd:minInclusive value="1" fixed="false"/>
+			<xsd:maxInclusive value="5"/>
+			<xsd:totalDigits value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="VerspaetungType">
+		<xsd:restriction base="xsd:integer"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="VorschauzeitType">
+		<xsd:restriction base="xsd:positiveInteger"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="ZyklusType">
+		<xsd:restriction base="xsd:positiveInteger"/>
+	</xsd:simpleType>
+</xsd:schema>
